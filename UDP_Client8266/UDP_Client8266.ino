@@ -29,6 +29,7 @@ void setup() {
     digitalWrite(LED_BUILTIN, LOW);
     delay(500);
     digitalWrite(LED_BUILTIN, HIGH);
+    delay(500);
   }
   ip = WiFi.localIP();
   digitalWrite(LED_BUILTIN, LOW);
