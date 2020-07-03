@@ -3,11 +3,11 @@
 #include <WiFiUdp.h>
 
 #ifndef STASSID
-#define STASSID "DDAP"
-#define STAPSK  "34343434"
+#define STASSID "DAP"
+#define STAPSK  "12345678"
 #endif
 
-unsigned int localPort = 8266;      // local port to listen on
+unsigned int Port = 8266;      // local port to listen on
 
 // buffers for receiving and sending data
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE + 1]; //buffer to hold incoming packet,
@@ -23,18 +23,22 @@ void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);
+  WiFi.macAddress(mac);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
+    digitalWrite(LED_BUILTIN, LOW);
     delay(500);
+    digitalWrite(LED_BUILTIN, HIGH);
   }
-  //  Serial.print("Connected! IP address: ");
-  //  Serial.println(WiFi.localIP());
-  digitalWrite(LED_BUILTIN, LOW);
-  WiFi.macAddress(mac);
   ip = WiFi.localIP();
-  Serial.printf("UDP server on port %d\n", localPort);
-  //sprintf(ReplyBuffer, "ack from %d.%d.%d.%d, %2X:%2X:%2X:%2X:%2X:%2X\r\n", ip[0], ip[1], ip[2], ip[3], mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]);
-  Udp.begin(localPort);
+  digitalWrite(LED_BUILTIN, LOW);
+  Serial.print("Connected! IP address: ");
+  Serial.println(ip);
+  Serial.printf("UDP server on port %d\n", Port);
+  while (! Udp.begin(Port) ) {                             // UDP protocol connected to localPort which is a variable
+    Serial.println('+');
+    yield();                                                    // Play nicely with RTOS (alias = delay(0))
+  }
 }
 
 void loop() {
@@ -53,17 +57,17 @@ void loop() {
     Serial.println("Contents:");
     Serial.println(packetBuffer);
 
-    if (strcmp(packetBuffer, "L0") == 0) {
+    if (strcmp(packetBuffer, "L0") == 0) {  //turn led off
       digitalWrite(LED_BUILTIN, HIGH);
     }
-    if (strcmp(packetBuffer, "L1") == 0) {
+    if (strcmp(packetBuffer, "L1") == 0) {  //turn led ON
       digitalWrite(LED_BUILTIN, LOW);
     }
-    if (strcmp(packetBuffer, "FB") == 0) {
+    if (strcmp(packetBuffer, "FB") == 0) {  //led fast blink twice
       ledFastBlinkTwice();
     }
 
-    if (strcmp(packetBuffer, "Anyone?") == 0) {//compare eq0
+    if (strcmp(packetBuffer, "Anyone?") == 0) { //got discover command
       // send a reply, to the IP address and port that sent us the packet we received
       Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
       ReplyBuffer = "Ack From" + ip.toString() + " MAC:" + mac2String(mac);
