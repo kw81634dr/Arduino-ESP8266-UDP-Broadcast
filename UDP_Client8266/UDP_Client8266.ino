@@ -3,8 +3,8 @@
 #include <WiFiUdp.h>
 
 #ifndef STASSID
-#define STASSID "DAP"
-#define STAPSK  "12345678"
+#define STASSID "****"
+#define STAPSK  "****"
 #endif
 
 unsigned int Port = 8266;      // local port to listen on
@@ -70,6 +70,11 @@ void loop() {
     }
     if (strcmp(packetBuffer, "FB") == 0) {  //led fast blink twice
       ledFastBlinkTwice();
+    }
+    if (strcmp(packetBuffer, "B") == 0) {  //led fast blink twice
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(20);
+      digitalWrite(LED_BUILTIN, HIGH);
     }
 
     if (strcmp(packetBuffer, "Anyone?") == 0) { //got discover command
