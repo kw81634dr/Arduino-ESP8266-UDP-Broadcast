@@ -58,6 +58,10 @@ void loop() {
     Serial.println("Contents:");
     Serial.println(packetBuffer);
 
+    if (strcmp(packetBuffer, "RESTART") == 0) {  //restart ESP8266
+      ESP.restart();
+    }
+
     if (strcmp(packetBuffer, "L0") == 0) {  //turn led off
       digitalWrite(LED_BUILTIN, HIGH);
     }
