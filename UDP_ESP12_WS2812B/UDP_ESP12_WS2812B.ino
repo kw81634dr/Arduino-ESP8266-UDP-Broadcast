@@ -31,7 +31,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);//LED_BUILTIN = D4 on WeMos D1 Mini
   digitalWrite(LED_BUILTIN, HIGH);
 
-  LEDS.addLeds<WS2812, DATA_PIN, GRB>(leds, NUM_LEDS);
+  LEDS.addLeds<WS2812, DATA_PIN, GRB>(leds, NUM_LEDS);  //GRB order is common on WS2812B
   LEDS.setBrightness(64);//0~255
   leds[0] = CRGB::Black;
   FastLED.show();
